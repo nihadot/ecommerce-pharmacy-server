@@ -33,7 +33,6 @@ export const getProducts = async (req, res) => {
    
 }
 
-
 export const getProductById = async (req, res) => {
 
     // const Products= await Product.findById(req.params.id)
@@ -54,6 +53,33 @@ export const getProductById = async (req, res) => {
     // console.log(Product);
 
     if(Products.length === 0) {
+        return res.status(404).json("no entries yet");
+    } else {
+        return res.status(200).json({ product: Products });
+    }
+}
+export const getOneProduct = async (req, res) => {
+
+    // const Products= await Product.findById(req.params.id)
+    //     return res.status(200).json({ product: Products });
+    // const Products = await Product.aggregate([
+    //     {
+    //         $lookup:{
+    //             from:"categories",
+    //             localField:"dropdown",
+    //             foreignField:"_id",
+    //             as:"categoriesInfo"
+    //         }
+    //     },
+    //     {
+    //         $unwind: "$categoriesInfo"
+    //     }
+    // ])
+
+    const Products = await Product.findById(req.params.id)
+    // console.log(Product);
+
+    if(Products?.length === 0) {
         return res.status(404).json("no entries yet");
     } else {
         return res.status(200).json({ product: Products });

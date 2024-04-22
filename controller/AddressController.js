@@ -1,5 +1,7 @@
 import mongoose from "mongoose";
 import { Address } from '../model/AddressModel.js';
+import { Cart } from "../model/CartModel.js";
+import { Order } from "../model/OrderModel.js";
 
 
 
@@ -72,7 +74,7 @@ import { Address } from '../model/AddressModel.js';
 export const create = async (req, res) => {
   console.log(req.body);
 
-const{fullname,phoneNumber,pinCode,state,houseNo,city,buildingName,roadName } =req.body;
+const{fullname,phoneNumber,pinCode,state,houseNo,city,buildingName,roadName,total } =req.body;
 
 if(!fullname || !phoneNumber || !pinCode || !state || !houseNo || !city  || !buildingName  || !roadName){
   return res.status(400).send({ message: "field is missing" });
@@ -81,10 +83,27 @@ if(!fullname || !phoneNumber || !pinCode || !state || !houseNo || !city  || !bui
   try {
     const newData = new Address(req.body);
 
-    const saveData = await newData.save();
+    const savedAddress= await newData.save();
+
+    const allCarts = await Cart.find({userId:new mongoose.Types.ObjectId(req.body.userId)});
+
+    const newOrder = new Order({productsArray:allCarts,userId:req.body.userId,total:req.body.total,addressId:savedAddress._id});
+
+    const savedOrder = await newOrder.save();
+
+
+    for( let cartsOf of allCarts  ){
+      await Cart.findByIdAndDelete(cartsOf._id);
+
+    }
+
+
+
+
+
 
     return res.status(201).json({
-      result: saveData,
+      result: savedOrder,
       message: "Successfully inserted address into db",
     });
   } catch (error) {

@@ -20,6 +20,11 @@ import jwt from "jsonwebtoken";
  import wishlistRoute from "./router/wishlistRouter.js"
  import addressRouter from "./router/addressRouter.js"
 import { getOffersCard } from "./controller/CartController.js";
+import { Order } from "./model/OrderModel.js";
+import mongoose from "mongoose";
+import { Product } from "./model/productModel.js";
+import { Address } from "./model/AddressModel.js";
+import { User } from "./model/UserModel.js";
 
 
   
@@ -46,8 +51,54 @@ app.use('/api/bannerone', banneroneRouter)
 app.use('/api/bannertwo', bannertwoRouter)
 app.use('/api/address', addressRouter)
 app.get('/api/offercard/:id', getOffersCard)
+app.get('/api/geetorders/getById/:id',async(req,res)=>{
+    
 
- 
+
+    const getOrders = await Order.find({userId:new mongoose.Types.ObjectId(req.params.id)})
+
+
+    console.log(getOrders,'ooooo')
+    // return true
+let getOrdersArray = []
+    for ( let ord of getOrders){
+        let arr = []
+        if(ord.productsArray.length > 0){
+
+            for(let ordOne of ord.productsArray){
+                if(ordOne?.productId){
+                    // console.log(ordOne.productId);
+                    const getproductOne = await Product.findById(ordOne.productId)
+                    arr.push(getproductOne)
+                }
+                
+            }
+        }
+        
+        let addreess = ''
+        if(ord.addressId){
+            addreess = await Address.findById(ord.addressId)
+        }
+        getOrdersArray.push({...ord._doc,productsArray:arr,addressInfo:addreess})
+
+    }
+    return res.status(200).json({data:getOrdersArray });
+
+})
+
+app.get('/api/user/getById/:id',async(req,res)=>{
+    
+
+
+    const getUser = await User.findById(req.params.id)
+
+
+
+    return res.status(200).json({data:getUser });
+
+})
+
+
 
 app.get("/api/profile",(req,res)=>{
     console.log("api");

@@ -1,28 +1,19 @@
 import mongoose from "mongoose";
 
 const adminSchema = new mongoose.Schema({
-    Fname: {
-        type: String,
-        required: [true, "Please add the firstname"],
-    },
-    Lname: {
-        type: String,
-        required: [true, "Please add the lastname"],
-    },
-    productId: {
+
+ 
+    addressId:{
         type: mongoose.Schema.Types.ObjectId,
-        required: [true, "Please add the product id"],
+
+    },
+    total:{
+        type: String
+
     },
     userId: {
         type:  mongoose.Schema.Types.ObjectId,
-        required: [true, "Please add the user id"],
-    },
-    cartId: {
-        type: mongoose.Schema.Types.ObjectId,
-    },
-
-    paymentId:{
-        type: mongoose.Schema.Types.ObjectId,
+       
     },
     productsArray: {
         type:Array
