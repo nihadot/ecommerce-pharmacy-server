@@ -2,77 +2,14 @@ import mongoose from "mongoose";
 import { Address } from '../model/AddressModel.js';
 import { Cart } from "../model/CartModel.js";
 import { Order } from "../model/OrderModel.js";
+import { Product } from "../model/productModel.js";
+import { Button } from "../model/Buttonmodel.js";
 
 
 
-
-// export const createAddress = async (req, res) => {
-//     try {
-//       const newAddress = new Address(req.body);
-//       const savedAddress = await newAddress.save();
-//       res.status(201).json(savedAddress);
-//     } catch (error) {
-//       res.status(400).json({ message: error.message });
-//     }
-//   };
-
-
-
-
-
-
-// // Get all addresses
-// export const getAddresses = async (req, res) => {
-//   try {
-//     const addresses = await Address.find();
-//     res.json(addresses);
-//   } catch (error) {
-//     res.status(500).json({ message: error.message });
-//   }
-// };
-
-// // Get address by ID
-// export const getAddressById = async (req, res) => {
-//   try {
-//     const address = await Address.findById(req.params.id);
-//     if (!address) {
-//       return res.status(404).json({ message: 'Address not found' });
-//     }
-//     res.json(address);
-//   } catch (error) {
-//     res.status(500).json({ message: error.message });
-//   }
-// };
-
-// // Delete address by ID
-// export const deleteAddressById = async (req, res) => {
-//   try {
-//     const address = await Address.findByIdAndDelete(req.params.id);
-//     if (!address) {
-//       return res.status(404).json({ message: 'Address not found' });
-//     }
-//     res.json({ message: 'Address deleted successfully' });
-//   } catch (error) {
-//     res.status(500).json({ message: error.message });
-//   }
-// };
-
-// // Update address by ID
-// export const editAddressById = async (req, res) => {
-//   try {
-//     const address = await Address.findByIdAndUpdate(req.params.id, req.body, { new: true });
-//     if (!address) {
-//       return res.status(404).json({ message: 'Address not found' });
-//     }
-//     res.json(address);
-//   } catch (error) {
-//     res.status(500).json({ message: error.message });
-//   }
-// };
 
 //CREATE
 export const create = async (req, res) => {
-  console.log(req.body);
 
 const{fullname,phoneNumber,pinCode,state,houseNo,city,buildingName,roadName,total } =req.body;
 
@@ -82,12 +19,49 @@ if(!fullname || !phoneNumber || !pinCode || !state || !houseNo || !city  || !bui
 
   try {
     const newData = new Address(req.body);
-
+console.log('working')
     const savedAddress= await newData.save();
 
-    const allCarts = await Cart.find({userId:new mongoose.Types.ObjectId(req.body.userId)});
 
+    console.log(savedAddress,'ssss')
+    const allCarts = await Cart.find({userId:new mongoose.Types.ObjectId(req.body.userId)});
+    
     const newOrder = new Order({productsArray:allCarts,userId:req.body.userId,total:req.body.total,addressId:savedAddress._id});
+   
+    for( let cart of allCarts ){
+      const product = await Product.findById(cart.productId);
+
+      
+      // console.log(product,'ddddd');
+
+      if(product){
+
+        if(product.quantity === 1){
+          await product.save()
+        }else{
+          product.quantity --
+          await product.save()
+        }
+        
+        
+        
+      }else{
+        const product = await Button.findById(cart.productId);
+        if(product){
+
+          if(product.quantity === 1){
+            await product.save()
+          }else{
+  
+            product.quantity --
+            await product.save()
+          }
+      }
+        
+
+    }
+  }
+
 
     const savedOrder = await newOrder.save();
 
@@ -104,7 +78,7 @@ if(!fullname || !phoneNumber || !pinCode || !state || !houseNo || !city  || !bui
 
     return res.status(201).json({
       result: savedOrder,
-      message: "Successfully inserted address into db",
+      message: "Order Placed",
     });
   } catch (error) {
     return res.status(404).json({ message: error.message || "error" });

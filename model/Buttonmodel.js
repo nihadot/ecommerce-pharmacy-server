@@ -21,6 +21,11 @@ const offercardSchema = new mongoose.Schema({
     cost:{
         type:String,
     },
+      
+    quantity: {
+        type: Number,
+        
+    },
     isOffercard:{
         type:Boolean,
         default:true
