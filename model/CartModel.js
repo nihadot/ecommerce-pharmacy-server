@@ -14,6 +14,8 @@ const cartSchema = new mongoose.Schema({
     offer:{
         type:Boolean,
         default:false
+
+        
     }
 },
     {

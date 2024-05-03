@@ -190,11 +190,11 @@ let products = []
       },
     ]);
   
-    if (getData.length === 0) {
-      return res.status(404).json("no entries yet");
-    } else {
+    // if (getData.length === 0) {
+    //   return res.status(404).json("no entries yet");
+    // } else {
       return res.status(200).json({ result: getData });
-    }
+    // }
   };
   
   export const getById = async (req, res) => {
